@@ -16,26 +16,7 @@ Python3 + Postgres
 
 
 3) Edit the settings.py file:
-
-`
-DATABASES = {
-
-    'default': {
-
-        'ENGINE': 'django.db.backends.postgresql',
-
-        'NAME': '<databasename>',
-
-        'USER': '<username>',
-
-        'PASSWORD': '<password>',
-
-        'HOST': 'localhost',
-
-        'PORT': '5432',
-    }
-}
-`
+Set your NAME, USER and PASSWORD for your database.
 
 
 4) Make and migrate migrations:

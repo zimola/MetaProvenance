@@ -29,3 +29,54 @@ html{
 section{
   padding: 50px 0;
 }
+
+
+.row{
+    max-width: 1140px;
+    margin: 0 auto 0 auto;
+}
+
+
+
+/*-----------------------------*/
+/* Navbar + Header*/
+/*-----------------------------*/
+
+.navbar ul {
+    list-style-type: none;
+    margin-top: 0px;
+    padding: 0;
+    overflow: hidden;
+}
+
+
+.navbar li{
+    float: right;
+}
+
+.navbar li a {
+    display: block;
+    color: whitesmoke;
+    text-align: center;
+    padding: 10px 16px;
+    text-decoration: none;
+    border: 1px solid transparent;
+
+}
+
+.navbar li a:hover {
+    border-bottom: 1px solid whitesmoke;
+
+}
+
+header{
+    background-image: linear-gradient(rgba(100, 100, 100, 0.1), rgba(0, 0, 0, .5)), url("img/background.jpg") ;
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    height:100vh;
+}
+
+header-content{
+
+}
