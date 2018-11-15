@@ -2,7 +2,7 @@
 Python3 + Postgres
 
 
-## for local development
+## For Local Development
 0) Install requirements:
 `pip install -r requirements.txt`
 
@@ -17,9 +17,11 @@ Python3 + Postgres
 
 3) Edit the settings.py file:
 
-
+`
 DATABASES = {
+
     'default': {
+
         'ENGINE': 'django.db.backends.postgresql',
 
         'NAME': '<databasename>',
@@ -33,6 +35,7 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+`
 
 
 4) Make and migrate migrations:
