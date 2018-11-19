@@ -1,0 +1,34 @@
+{% extends 'landingpage/base.html' %}
+
+{% block content %}
+<header>
+  <div class="navbar">
+    <ul>
+      <li><a href="#">Sign Up</a></li>
+      <li><a href="#">Sign In</a></li>
+      {% if user.is_authenticated  %}
+      <li><a href="#">Search</a></li>
+      <li><a href="#">Upload</a></li>
+      <li><a href="#">Browse</a></li>
+      {% endif %}
+      <li><a href="#">About</a></li>
+    </ul>
+  </div>
+  <div class="header-text">
+    <h2>MetaProvenance | Bioinformatics Database</h2>
+    <p>Lorem ipsum dolor sit amet, ipslaborum magni maiores, minima
+      molestiae natus necessitatibus officia quod sequi suscipit vel vero voluptatum!</p>
+  </div>
+
+  <!--
+  <div class="header-textbox">
+    <h1>A.I Powered Aquaculture</h1>
+    <h4>Maximize what your underwater cameras do for you.
+      Calculate biomass, optimize feed, and montior fish health with our Deep Learning Software.</h4>
+    <a class="btn-textbox"href="#">Contact Us</a>
+  </div>
+
+  -->
+</header>
+
+{% endblock %}
