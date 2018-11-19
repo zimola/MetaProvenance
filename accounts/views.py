@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .forms import SignInForm, SignUpForm
+from django.contrib.auth import authenticate, login, logout
+
 
 
 def account_signup(request):
@@ -8,12 +10,18 @@ def account_signup(request):
 
     if request.method == 'POST' and form.is_valid():
         # todo clean password
-        #user = form.save(commit=False)
+        user = form.save(commit=False)
         email = form.cleaned_data['email']
         password = form.cleaned_data['password']
         confirm_password = form.cleaned_data['confirm_password']
         if form.passwords_match():
-            print("matching passwords")
+            user.set_password(password)
+            user.save()
+            authenticate(email=email, password=password)
+            login(request, user)
+            return redirect('landing')
+
+
         else:
             print("passwords do not match")
         pass

@@ -22,12 +22,12 @@ class SignUpForm(forms.ModelForm):
         self.fields['password'].widget.attrs['placeholder'] = 'Password'
 
     def passwords_match(self):
-        if self.password == self.confirm_password:
+        if self.data['password'] == self.data['confirm_password']:
             return True
         else:
             return False
 
 
 class SignInForm(forms.Form):
-    email = forms.CharField(label="Email", max_length=40, widget=forms.TextInput(attrs={'placeholder': "Email"}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
+    email = forms.CharField(required=True, label="Email", max_length=40, widget=forms.TextInput(attrs={'placeholder': "Email"}))
+    password = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
