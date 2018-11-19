@@ -11,7 +11,11 @@ def account_signup(request):
         #user = form.save(commit=False)
         email = form.cleaned_data['email']
         password = form.cleaned_data['password']
-        # print(email, password)
+        confirm_password = form.cleaned_data['confirm_password']
+        if form.passwords_match():
+            print("matching passwords")
+        else:
+            print("passwords do not match")
         pass
 
     return render(request, 'accounts/signup.html', context={'form': form, 'action': action})
