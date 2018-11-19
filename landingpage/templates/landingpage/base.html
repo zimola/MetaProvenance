@@ -13,9 +13,9 @@
     <ul>
       {% if user.is_authenticated  %}
       <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
-      <li><a href="#">Search</a></li>
-      <li><a href="#">Upload</a></li>
-      <li><a href="#">Browse</a></li>
+      <li><a href="{% url 'db:search' %}">Search</a></li>
+      <li><a href="{% url 'db:upload' %}">Upload</a></li>
+      <li><a href="{% url 'db:browse' %}">Browse</a></li>
       {% else %}
       <li><a href="{% url 'accounts:signup' %}">Sign Up</a></li>
       <li><a href="{% url 'accounts:signin' %}">Sign In</a></li>

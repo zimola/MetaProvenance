@@ -3,25 +3,20 @@ from .forms import SignInForm, SignUpForm
 from django.contrib.auth import authenticate, login, logout
 
 
-
 def account_signup(request):
     form = SignUpForm(request.POST or None)
     action = 'SignUp'
 
     if request.method == 'POST' and form.is_valid():
-        # todo clean password
         user = form.save(commit=False)
         email = form.cleaned_data['email']
         password = form.cleaned_data['password']
-        confirm_password = form.cleaned_data['confirm_password']
         if form.passwords_match():
             user.set_password(password)
             user.save()
             authenticate(email=email, password=password)
             login(request, user)
             return redirect('landing')
-
-
         else:
             print("passwords do not match")
         pass
@@ -34,18 +29,19 @@ def account_signin(request):
     action = 'SignIn'
 
     if request.method == 'POST' and form.is_valid():
-        #user = form.save(commit=False)
         email = form.cleaned_data['email']
         password = form.cleaned_data['password']
-        # print(email, password)
-        pass
+        user = authenticate(email=email, password=password)
+        if user:
+            login(request, user)
+            return redirect('landing')
 
     return render(request, 'accounts/signin.html', context={'form': form, 'action': action})
 
 
-
 def account_logout(request):
-    pass
+    logout(request)
+    return redirect('landing')
 
 
 def account_edit(request):
