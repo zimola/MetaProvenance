@@ -9,7 +9,6 @@
 }
 
 html{
-  color:#555;
   background-color: #efefef;
   font-family: 'Lato', 'Arial', sans-serif;
   font-weight: 300;
@@ -28,6 +27,10 @@ html{
 
 section{
   padding: 50px 0;
+}
+
+h1, h2, p{
+    color: black;
 }
 
 
@@ -77,6 +80,19 @@ header{
     height:100vh;
 }
 
-header-content{
 
+.header-text{
+    background-color: rgba(255, 255, 255, 0.65); /*linear-gradient(rgba(100, 100, 100, 0.5), rgba(100, 100, 100, .5)) ;*/
+    text-align: center;
+    margin-top: 150px;
+    padding-top:15px;
+    padding-bottom: 15px;
+}
+
+.header-text p {
+    max-width: 70%;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top: 20px;
+    line-height: 150%;
 }
