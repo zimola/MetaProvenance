@@ -46,3 +46,7 @@ def account_logout(request):
 
 def account_edit(request):
     pass
+
+
+def forgot_password(request):
+    pass
