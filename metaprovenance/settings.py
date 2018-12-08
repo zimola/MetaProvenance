@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     'db',
     'accounts',
     'landingpage',
+    'django_tables2',
+    'import_export',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
