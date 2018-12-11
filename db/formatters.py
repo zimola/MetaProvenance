@@ -5,12 +5,58 @@
 #
 ####
 import io
+import zipfile
+import uuid
 
 import pandas as pd
 import numpy as np
 
+import q2_extractor as q2e
+
 def guess_filetype(unknown_file):
-    pass
+    #File types accepted: Sample Metadata (csv), Replicate Metadata (csv),
+    # Protocol Data (csv), Protocol Deviation (csv),
+    # artifact file (qza), visualization file (qzv)
+    if zipfile.is_zipfile(unknown_file):
+        #Probably an artifact/visualization file
+        #check if the base directory is a uuid
+        zf = zipfile.ZipFile(file_data)
+        for filename in zf.namelist():
+            try:
+                uuid.UUID(filename.split("/")[0])
+            except:
+                raise ValueError("Not a valid QIIME QZA or QZV file. " \
+                                 "All base directories must be a UUID.")
+        return "qz"
+    else:
+        try:
+            unknown_file.seek(0)
+            table = parse_csv_or_tsv(unknown_file)
+        except:
+            raise
+        #Sample Metadata only has sample-id required
+        #Replicate Metadata has sample-id and replicate-id
+        #Protocol Data has step, method, parameter_name, parameter_value, 
+        # and description
+        #Protocol Deviation has procotol_name, replicate-id, parameter_name, 
+        # parameter_value
+        if np.all([x in table for x in ["sample-id", "replicate-id", 
+                                        "protocol"]]):
+            return 'replicate_table'
+        elif np.all([x in table for x in ["protocol_name", "replicate-id",
+                                          "parameter_name", "parameter_value"]]):
+            return 'protocoldeviation_table'
+        elif np.all([x in table for x in ['step', 'method', 'parameter_name',
+                                          'parameter_default', 'description']]):
+            return 'protocol_table'
+        elif 'sample-id' in table:
+            return 'sample_table'
+        else:
+            raise ValueError("Could not parse input file.")
+
+
+
+    
 
 def parse_csv_or_tsv(table_file):
     table_string = table_file.read().decode()
