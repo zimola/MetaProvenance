@@ -18,6 +18,7 @@ def account_signup(request):
             login(request, user)
             return redirect('landing')
         else:
+            # todo add error html
             print("passwords do not match")
         pass
 

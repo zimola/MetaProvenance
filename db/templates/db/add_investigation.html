@@ -1,0 +1,31 @@
+{% extends 'db/base.html' %}
+
+{% block content %}
+
+  <!-- todo. make add investigation form -->
+
+    <div class = "add-investigation-form">
+      <form method="POST">{% csrf_token %}
+        <p class="form-label"><em>{{ action }}</em></p>
+      <ul>
+        <li>Investigation Name</li>
+        <li>{{ form.name }}</li>
+        <li>Institution</li>
+        <li>{{ form.institution }}</li>
+        <li>Description</li>
+        <li>{{ form.description }}</li>
+      </ul>
+        <div class= "center"><button>{{ action }}</button></div>
+      </form>
+    </div>
+
+  <!-- todo list investigations for person to select -->
+
+  <!-- todo add search functionality for investigations. -->
+  <div class="search-investigations">
+    <form method="get" action="{% url 'db:search_investigation' %}">
+      <input name="q" value="{{ request.GET.q }}" placeholder="Search for existing Investigations">
+      <input type="submit">
+    </form>
+  </div>
+{% endblock %}
