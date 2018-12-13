@@ -1,12 +1,8 @@
 $(function () {
 
-  $(".js-upload").click(function () {
-    $("#fileupload").click();
-  });
-
   $("#fileupload").fileupload({
     dataType: 'json',
-    sequentialUploads: true,  /* 1. SEND THE FILES ONE BY ONE */
+    sequentialUploads: false,  /* 1. SEND THE FILES ONE BY ONE */
     start: function (e) {  /* 2. WHEN THE UPLOADING PROCESS STARTS, SHOW THE MODAL */
       $("#modal-progress").modal("show");
     },
@@ -20,13 +16,12 @@ $(function () {
       $(".progress-bar").text(strProgress);
     },
     done: function (e, data) {
-      if (data.result.is_valid) {
-        $("#sample_tab").prepend(
-          data.result.sample_table
-        );
-        $("#metadata_tab").prepend(
-          data.result.metadata_table
-        );
+      if (data.result.confirm_visible) {
+        $("#confirm_button").show();
+        $("#drop_zone").hide();
+      }
+      if (data.result.confirm_type == "sample_table") {
+        $("#info_pane").html(`Sample table detected<br/>Number of new samples: ${data.result.num_new_samples} <br/>Number of previously registered samples (will not be overwritten): ${data.result.num_registered_samples}`);
       }
     }
 
