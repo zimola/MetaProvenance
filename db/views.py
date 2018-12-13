@@ -71,6 +71,8 @@ def confirm_samples_view(request):
             if form.is_valid():
                 print("SAVING")
                 del request.session['confirm_samples']
+                del request.session['confirm_visible']
+                del request.session['confirm_type']
                 return redirect('landing')
         else:
             #create an initial form
@@ -140,6 +142,7 @@ def upload_view(request):
                 #This shouldn't happen except for farked up sessions, but this
                 #should jog the state back if it does
                 del request.session['confirm_visible']
+                del request.session['sample_names']
                 return
             else:
                 if request.session['confirm_type'] == 'sample_table':
