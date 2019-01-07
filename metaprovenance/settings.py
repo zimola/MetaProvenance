@@ -82,9 +82,9 @@ WSGI_APPLICATION = 'metaprovenance.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'metaprovenance',
-        'USER': 'metaprovenance_admin',
-        'PASSWORD': 'admin',
+        'NAME': 'prov',
+        'USER': 'm',
+        'PASSWORD': 'Steph204',
         'HOST': 'localhost',
         'PORT': '5432',
     }

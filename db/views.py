@@ -8,10 +8,10 @@ from django.contrib.messages import get_messages
 from django.http import JsonResponse
 
 import django_tables2 as tables
-from import_export import resources
-from tablib import Dataset
+#from import_export import resources
+#from tablib import Dataset
 import io
-from django_ajax.decorators import ajax
+#from django_ajax.decorators import ajax
 
 from .formatters import format_sample_metadata, guess_filetype
 from .models import Sample
@@ -37,11 +37,15 @@ def add_investigations_view(request):
     return render(request, 'db/add_investigation.html', context)
 
 
+
+
+
+
 def investigation_search(request):
     # todo full text search on investigation table
     query = request.GET.get('q')
     print(query)
-    return redirect('db:add_investigation')
+    return render(request, 'db/search_investigation.html')
 
 def list_of_investigations():
     #todo, list of 20 or so most recent investigations
@@ -132,6 +136,7 @@ def browse(request):
 
 @login_required()
 def upload_view(request):
+    create_investigation_form = CreateInvestigationForm(request.POST or None)
     form = UploadTestForm(request.POST, request.FILES)
     if (request.method == 'POST') & form.is_valid():
         #If we've already been here, confirm_visible will be in the session
@@ -164,7 +169,7 @@ def upload_view(request):
                     previously_registered.append(sample_id)
                 else:
                     new_samples.append(sample_id)
-            data = {'confirm_visible': True,
+            context = {'confirm_visible': True,
                     'confirm_type': guessed_type,
                     'num_new_samples': len(new_samples),
                     'num_registered_samples': len(previously_registered)}
@@ -173,8 +178,8 @@ def upload_view(request):
             request.session['confirm_type'] = guessed_type
             
         else:
-            data = {'form': form, 'confirm_visible': False}
-        return JsonResponse(data)
+            context = {'form': form, 'confirm_visible': False, 'create_investigation_form': create_investigation_form}
+        return JsonResponse(context)
     else:
-        data={'form': form, 'confirm_visible': False}
-        return render(request, 'db/upload.html', data)
+        context = {'form': form, 'confirm_visible': False, 'create_investigation_form': create_investigation_form}
+        return render(request, 'db/upload.html', context)

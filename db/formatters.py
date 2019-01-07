@@ -11,7 +11,7 @@ import uuid
 import pandas as pd
 import numpy as np
 
-import q2_extractor as q2e
+# import q2_extractor as q2e
 
 def guess_filetype(unknown_file):
     #File types accepted: Sample Metadata (csv), Replicate Metadata (csv),

@@ -1,5 +1,4 @@
 $(function () {
-
   $("#fileupload").fileupload({
     dataType: 'json',
     sequentialUploads: false,  /* 1. SEND THE FILES ONE BY ONE */
