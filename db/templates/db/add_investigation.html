@@ -7,13 +7,12 @@
     <div class = "add-investigation-form">
       <form method="POST">{% csrf_token %}
         <p class="form-label"><em>{{ action }}</em></p>
-      <ul>
-        <li>Investigation Name</li>
-        <li>{{ form.name }}</li>
-        <li>Institution</li>
-        <li>{{ form.institution }}</li>
-        <li>Description</li>
-        <li>{{ form.description }}</li>
+        Investigation Name
+        <p>{{ form.name }}</p>
+        Institution
+        <p>{{ form.institution }}</p>
+        Description
+        <p>{{ form.description }}</p>
       </ul>
         <div class= "center"><button>ADD INVESTIGATION</button></div>
       </form>

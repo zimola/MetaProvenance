@@ -8,27 +8,28 @@
         });
 
 */
-$('#from-sop-anchor').on('click', function(e){
+$('#from-sop-anchor').on('click', function(){
     console.log('upload clicked');
     $("#sop-upload").css("display", "block");
     $("#add-investigation").css("display", "none");
+    $("#search-investigation").css("display", "none");
 
-
-    //window.clearTimeout(delete_timer);
-    //remove_delete_alert()
-    //$(comment_el).fadeIn("slow");
 });
 
-$('#add-investigation-anchor').on('click', function(e){
+$('#add-investigation-anchor').on('click', function(){
     console.log('upload clicked');
     $("#add-investigation").css("display", "block");
     $("#sop-upload").css("display", "none");
-
-    //window.clearTimeout(delete_timer);
-    //remove_delete_alert()
-    //$(comment_el).fadeIn("slow");
+    $("#search-investigation").css("display", "none");
 });
 
+
+$('#search-investigation-anchor').on('click', function(){
+    console.log('search clicked');
+    $("#search-investigation").css("display", "block");
+    $("#add-investigation").css("display", "none");
+    $("#sop-upload").css("display", "none");
+});
 
 
 //smooth clicking transition
