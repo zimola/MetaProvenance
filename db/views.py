@@ -11,7 +11,6 @@ import django_tables2 as tables
 from import_export import resources
 from tablib import Dataset
 import io
-from django_ajax.decorators import ajax
 
 from .formatters import format_sample_metadata, guess_filetype
 from .models import Sample
@@ -102,7 +101,6 @@ def add_wetlab_view(request):
 '''
 BIOLOGICAL PROTOCOL
 '''
-
 
 @login_required()
 def add_biological_protocol_view(request):

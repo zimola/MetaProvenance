@@ -82,9 +82,9 @@ WSGI_APPLICATION = 'metaprovenance.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'metaprovenance',
-        'USER': 'metaprovenance_admin',
-        'PASSWORD': 'admin',
+        'NAME': 'mpdb',
+        'USER': 'mpuser',
+        'PASSWORD': 'abc123',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -140,5 +140,3 @@ STATICFILES_DIRS = [
 '''
 
 AUTH_USER_MODEL = 'accounts.User'
-
-
