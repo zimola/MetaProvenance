@@ -14,6 +14,4 @@ urlpatterns = [
     path('add/wetlab/', views.add_wetlab_view, name='add_wetlab'),
     path('add/biological_protocol/', views.add_biological_protocol_view, name='add_biological_protocol'),
     path('add/pipeline_results/', views.add_pipeline_results_view, name='add_pipeline_results'),
-
-
 ]
