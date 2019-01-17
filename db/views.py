@@ -6,15 +6,57 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.http import JsonResponse
+from django.urls import reverse
+
+from django_jinja_knockout.views import (
+        BsTabsMixin, ListSortingView, InlineCreateView, InlineCrudView, InlineDetailView
+)
 
 import django_tables2 as tables
 import io
 
 from .formatters import format_sample_metadata, guess_filetype
-from .models import Sample
+from .models import Sample, Investigation
+from .forms import InvestigationDisplayWithInlineFormsets, InvestigationWithInlineFormsets, InvestigationWithInlineSamples
+
 import pandas as pd
 import numpy as np
 
+'''
+DJK INVESTIGATIONS
+Class-based Django-Jinja-Knockout views
+'''
+
+class InvestigationList(ListSortingView):
+    model = Investigation
+    allowed_sort_orders = '__all__'
+    #allowed_filter_fields = {'description': None}
+    grid_fields = ['name', 'institution', 'description']
+
+
+class InvestigationDetail(InlineDetailView):
+    pk_url_kwarg = 'investigation_id'
+    #template_name = 'investigation_edit.htm'
+    form_with_inline_formsets = InvestigationDisplayWithInlineFormsets
+
+class InvestigationUpdate(InlineCrudView):
+    format_view_title = True
+    pk_url_kwarg = 'investigation_id'
+    form_with_inline_formsets = InvestigationWithInlineFormsets
+
+class InvestigationCreate(BsTabsMixin, InlineCreateView):
+    format_view_title = True
+    pk_url_kwarg = 'investigation_id'
+    form_with_inline_formsets = InvestigationWithInlineSamples
+    def get_bs_form_opts(self):
+        return {
+            'class': 'investigation',
+            'title': 'Create investigation',
+            'submit_text': 'Save investigation'
+        }
+
+    def get_success_url(self):
+        return reverse('investigation_detail', kwargs={'investigation_id': self.object.pk})    
 
 '''
 INVESTIGATIONS
@@ -32,11 +74,6 @@ def add_investigations_view(request):
         return redirect('landing')
     context = {'form': form, 'action': action}
     return render(request, 'db/add_investigation.html', context)
-
-
-
-
-
 
 def investigation_search(request):
     # todo full text search on investigation table
@@ -152,27 +189,28 @@ def upload_view(request):
                     return redirect('landing')
         # File processing code
         # Guess what it is, then rewind the inmemoryfile
-        guessed_type = guess_filetype(request.FILES['upload_file'])
-        request.FILES['upload_file'].seek(0)
-        
-        if guessed_type == 'sample_table':
-            table = format_sample_metadata(request.FILES['upload_file'])
-            new_samples = []
-            previously_registered = []
-            for sample_id in np.unique(table['sample-id']):
-                sc = Sample.objects.filter(name__exact=sample_id)
-                if sc.count() > 0:
-                    previously_registered.append(sample_id)
-                else:
-                    new_samples.append(sample_id)
-            context = {'confirm_visible': True,
-                    'confirm_type': guessed_type,
-                    'num_new_samples': len(new_samples),
-                    'num_registered_samples': len(previously_registered)}
-            request.session['confirm_samples'] = ','.join(new_samples)
-            request.session['confirm_visible'] = True
-            request.session['confirm_type'] = guessed_type
-            
+        if 'upload_file' in request.FILES:
+            guessed_type = guess_filetype(request.FILES['upload_file'])
+            request.FILES['upload_file'].seek(0)    
+            if guessed_type == 'sample_table':
+                table = format_sample_metadata(request.FILES['upload_file'])
+                new_samples = []
+                previously_registered = []
+                for sample_id in np.unique(table['sample-id']):
+                    sc = Sample.objects.filter(name__exact=sample_id)
+                    if sc.count() > 0:
+                        previously_registered.append(sample_id)
+                    else:
+                        new_samples.append(sample_id)
+                context = {'confirm_visible': True,
+                        'confirm_type': guessed_type,
+                        'num_new_samples': len(new_samples),
+                        'num_registered_samples': len(previously_registered)}
+                request.session['confirm_samples'] = ','.join(new_samples)
+                request.session['confirm_visible'] = True
+                request.session['confirm_type'] = guessed_type    
+            else:
+                context = {'form': form, 'confirm_visible': False, 'create_investigation_form': create_investigation_form}
         else:
             context = {'form': form, 'confirm_visible': False, 'create_investigation_form': create_investigation_form}
         return JsonResponse(context)

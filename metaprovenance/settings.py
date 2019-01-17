@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+from distutils.version import LooseVersion
+from django.utils.version import get_version
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,10 +30,12 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+# Django-jinja2-knockout'd packages
+DJK_APPS = ['metaprovenance', 'db']
+
 # Application definition
 
 INSTALLED_APPS = [
-    'db',
     'accounts',
     'landingpage',
     'django_tables2',
@@ -42,7 +46,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-]
+    'django_jinja',
+    'django_jinja.contrib._humanize',
+    'django_jinja_knockout',
+    'djk_ui',
+] + DJK_APPS
+
+DJK_MIDDLEWARE = 'django_jinja_knockout.middleware.ContextMiddleware'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -53,23 +63,42 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+if LooseVersion(get_version()) >= LooseVersion('1.11'):
+    MIDDLEWARE.append(DJK_MIDDLEWARE)
+else:
+    MIDDLEWARE_CLASSES = MIDDLEWARE
+    MIDDLEWARE.extend([
+        'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+        DJK_MIDDLEWARE,
+    ])
 
 ROOT_URLCONF = 'metaprovenance.urls'
 
 TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
+        {
+          "BACKEND": "django_jinja.backend.Jinja2",
+          "APP_DIRS": True,
+          "OPTIONS": {
+            "match_extension": ".htm",
+            "app_dirname": "jinja2",
+            'context_processors': [
+                'django.template.context_processors.i18n',
+                'django_jinja_knockout.context_processors.template_context_processor'
+            ]
+          },
+        },
+        { 'BACKEND': 'django.template.backends.django.DjangoTemplates',
+          'DIRS': [],
+          'APP_DIRS': True,
+          'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+          },
         },
-    },
 ]
 
 WSGI_APPLICATION = 'metaprovenance.wsgi.application'
@@ -89,8 +118,6 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

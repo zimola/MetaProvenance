@@ -41,7 +41,7 @@ class BiologicalReplicate(models.Model):
     sample = models.ForeignKey('Sample', on_delete=models.CASCADE)  # fk 1
     sequence_file = models.ManyToManyField('Document') # store the location of the sequence file(s)
     biological_replicate_protocol = models.ForeignKey('BiologicalReplicateProtocol', on_delete=models.CASCADE)  # fk 5
-
+    investigation = models.ForeignKey('Investigation', on_delete=models.CASCADE)
 
 class BiologicalReplicateMetadata(models.Model):
     """
