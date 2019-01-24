@@ -1,35 +1,59 @@
 from django import forms
 from django.db import models
-from .models import BiologicalReplicate, Investigation, Sample
+from django.forms.widgets import HiddenInput
+from django.forms.utils import flatatt
+from django.utils.html import format_html
+from django.urls import reverse
+from .models import (
+    BiologicalReplicate, BiologicalReplicateProtocol, ComputationalPipeline,
+    Investigation, ProtocolStep, ProtocolStepParameter, Sample, SampleMetadata
+)
 
 from django_jinja_knockout.forms import (
     DisplayModelMetaclass, FormWithInlineFormsets, RendererModelForm,
-    ko_inlineformset_factory
+    ko_inlineformset_factory, WidgetInstancesMixin
 )
+from django_jinja_knockout.widgets import ForeignKeyGridWidget, DisplayText
 
 '''
 Django-Jinja-Knockout Forms
 '''
 
+#Base Forms and Display Forms
+
 class InvestigationForm(RendererModelForm):
-    class Meta(RendererModelForm.Meta):
+    class Meta:
         model = Investigation
         fields = '__all__'
 
 class InvestigationDisplayForm(RendererModelForm, 
                                metaclass=DisplayModelMetaclass):
-    class Meta(InvestigationForm.Meta):
-        pass
+    class Meta:
+        model = Investigation
+        fields = '__all__'
+
+
+class NameLabelChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return "%s" % (obj.name,)
 
 class SampleForm(RendererModelForm):
+    investigation = NameLabelChoiceField(queryset = Investigation.objects.all())
     class Meta:
         model = Sample
         fields = '__all__'
 
-class SampleDisplayForm(RendererModelForm, metaclass=DisplayModelMetaclass):
+class SampleDisplayForm(WidgetInstancesMixin, RendererModelForm, metaclass=DisplayModelMetaclass):
     class Meta:
+        def get_name(self, value):
+            return format_html('<a{}>{}</a>', flatatt({'href': reverse('sample_detail', kwargs={'sample_id': self.instance.pk})}), self.instance.name)
+        def get_investigation(self, value):
+            return format_html('<a{}>{}</a>', flatatt({'href': reverse('investigation_detail', kwargs={'investigation_id': self.instance.investigation.pk})}), self.instance.investigation.name)
+
         model = Sample
         fields = '__all__'
+        widgets = {'name': DisplayText(get_text_method=get_name),
+                   'investigation': DisplayText(get_text_method=get_investigation)}
 
 class ReplicateForm(RendererModelForm):
     class Meta:
@@ -41,6 +65,66 @@ class ReplicateDisplayForm(RendererModelForm, metaclass=DisplayModelMetaclass):
         model = BiologicalReplicate
         fields = '__all__'
 
+class SampleMetadataForm(RendererModelForm):
+    class Meta:
+        model = SampleMetadata
+        fields = '__all__'
+
+class SampleMetadataDisplayForm(RendererModelForm, metaclass=DisplayModelMetaclass):
+    class Meta:
+        model = SampleMetadata
+        fields = '__all__'
+
+class ProtocolForm(RendererModelForm):
+    class Meta:
+        model = BiologicalReplicateProtocol
+        fields = '__all__'
+
+class ProtocolDisplayForm(RendererModelForm, metaclass=DisplayModelMetaclass):
+    class Meta:
+        model = BiologicalReplicateProtocol
+        fields = '__all__'
+
+class PipelineForm(RendererModelForm):
+    class Meta:
+        model = ComputationalPipeline
+        fields = '__all__'
+
+class PipelineDisplayForm(RendererModelForm, metaclass=DisplayModelMetaclass):
+    class Meta:
+        model = ComputationalPipeline
+        fields = '__all__'
+
+class ProtocolStepForm(RendererModelForm):
+    protocolstep = NameLabelChoiceField(queryset=ProtocolStep.objects.all())
+    protocolstep.label = "Protocol Step"
+    class Meta:
+        model = ProtocolStep
+        fields = '__all__'
+    def __init__(self, *args, **kwargs):
+        super(ProtocolStepForm, self).__init__(*args, **kwargs)
+        if 'biological_replicate_protocols' in self.fields:
+            self.fields.pop('biological_replicate_protocols')
+            self.fields.pop('protocolstep')
+
+class ProtocolStepDisplayForm(RendererModelForm, metaclass=DisplayModelMetaclass):
+    class Meta:
+        model = ProtocolStep
+        fields = '__all__'
+        
+class ProtocolStepParameterForm(RendererModelForm):
+    class Meta:
+        model = ProtocolStepParameter
+        fields = '__all__'
+
+class ProtocolStepParameterDisplayForm(RendererModelForm, metaclass=DisplayModelMetaclass):
+    class Meta:
+        model = ProtocolStepParameter
+        fields = '__all__'
+
+
+# Inline/Compound Forms
+
 InvestigationSampleFormset = ko_inlineformset_factory(Investigation,
                                                       Sample,
                                                       form=SampleForm,
@@ -50,35 +134,80 @@ InvestigationDisplaySampleFormset = ko_inlineformset_factory(
                                                  Investigation,
                                                  Sample,
                                                  form=SampleDisplayForm)
-InvestigationReplicateFormset = ko_inlineformset_factory(Investigation,
-                                                         BiologicalReplicate,
-                                                         form=ReplicateForm,
-                                                         extra=0)
-InvestigationDisplayReplicateFormset = ko_inlineformset_factory(
-                                                 Investigation,
-                                                 BiologicalReplicate,
-                                                 form=ReplicateDisplayForm)
 
 class InvestigationWithInlineFormsets(FormWithInlineFormsets):
     FormClass = InvestigationForm
-    FormsetClasses = [InvestigationSampleFormset,
-                      InvestigationReplicateFormset]
+    FormsetClasses = [InvestigationSampleFormset]
 
 class InvestigationWithInlineSamples(FormWithInlineFormsets):
     FormClass = InvestigationForm
     FormsetClasses = [InvestigationSampleFormset]
 
-    def get_bs_form_opts(self):
-        return {
-            'class': 'investigation',
-            'title': format_html('Edit "{}"', self.object),
-            'submit_text': 'Save Investigation'
-        }
-
 class InvestigationDisplayWithInlineFormsets(FormWithInlineFormsets):
      FormClass = InvestigationDisplayForm
-     FormsetClasses = [InvestigationDisplaySampleFormset,
-                       InvestigationDisplayReplicateFormset]
+     FormsetClasses = [InvestigationDisplaySampleFormset]
+
+SampleDisplayMetadataFormset = ko_inlineformset_factory(Sample,
+                                                 SampleMetadata,
+                                                 form=SampleMetadataDisplayForm)
+
+SampleDisplayReplicateFormset = ko_inlineformset_factory(Sample,
+                                                      BiologicalReplicate,
+                                                      form=ReplicateDisplayForm)
+
+SampleMetadataFormset = ko_inlineformset_factory(Sample, SampleMetadata,
+                                                 form=SampleMetadataForm,
+                                                 extra=0,
+                                                 min_num=0)
+
+SampleReplicateFormset = ko_inlineformset_factory(Sample, BiologicalReplicate,
+                                                  form=ReplicateForm,
+                                                  extra=0, min_num=0)
+
+class SampleWithInlineMetadata(FormWithInlineFormsets):
+    FormClass = SampleForm
+    FormsetClasses = [SampleMetadataFormset, SampleReplicateFormset]
+
+class SampleDisplayWithInlineMetadata(FormWithInlineFormsets):
+    FormClass = SampleDisplayForm
+    FormsetClasses = [SampleDisplayReplicateFormset, \
+                      SampleDisplayMetadataFormset]
+
+ProtocolStepDisplayFormset = ko_inlineformset_factory(BiologicalReplicateProtocol,
+                                                      ProtocolStep.biological_replicate_protocols.through,
+                                                      form=ProtocolStepDisplayForm)
+
+ProtocolStepFormset = ko_inlineformset_factory(BiologicalReplicateProtocol,
+                                               ProtocolStep.biological_replicate_protocols.through,
+                                               form=ProtocolStepForm,
+                                               extra=0, min_num=0)
+
+class ProtocolDisplayWithInlineSteps(FormWithInlineFormsets):
+    FormClass = ProtocolDisplayForm
+    FormsetClasses = [ProtocolStepDisplayFormset]
+
+class ProtocolWithInlineSteps(FormWithInlineFormsets):
+    FormClass = ProtocolForm
+    FormsetClasses = [ProtocolStepFormset]
+    def get_formset_inline_title(self, formset):
+        return "Protocol Steps"
+
+ProtocolStepParameterDisplayFormset = ko_inlineformset_factory(ProtocolStep,
+                                                      ProtocolStepParameter,
+                                                      form = ProtocolStepParameterDisplayForm)
+
+ProtocolStepParameterFormset = ko_inlineformset_factory(ProtocolStep, 
+                                                        ProtocolStepParameter,
+                                                        form = ProtocolStepParameterForm,
+                                                        extra=0, min_num=0)
+
+class ProtocolStepWithInlineParameters(FormWithInlineFormsets):
+    FormClass = ProtocolStepForm
+    FormsetClasses = [ProtocolStepParameterFormset]
+
+class ProtocolStepDisplayWithInlineParameters(FormWithInlineFormsets):
+    FormClass = ProtocolStepDisplayForm
+    FormsetClasses = [ProtocolStepParameterDisplayFormset]
 
 ''' Django Forms '''
 

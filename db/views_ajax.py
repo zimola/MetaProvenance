@@ -1,7 +1,8 @@
+from collections import OrderedDict
 from django_jinja_knockout.views import KoGridView, KoGridInline
 
-from .models import BiologicalReplicate, Investigation, Sample
-from .forms import ReplicateForm, SampleForm
+from .models import BiologicalReplicate, Investigation, Sample, ProtocolStep
+from .forms import ProtocolForm, ReplicateForm, SampleForm
 
 class InvestigationGridView(KoGridView):
     model = Investigation
@@ -23,9 +24,6 @@ class SampleFkWidgetGrid(KoGridView):
     enable_deletion = True
     grid_fields = '__all__'
     allowed_sort_orders = '__all__'
-#    allowed_filter_fields = OrderedDict([
-#        ('direct_shipping', None)
-#    ])
 #    search_fields = [
 #        ('company_name', 'icontains'),
 #    ]
@@ -36,3 +34,13 @@ class ReplicateFkWidgetGrid(KoGridView):
     grid_fields = '__all__'
     allowed_sort_orders = '__all__'
 
+class ProtocolStepFkWidgetGrid(KoGridView):
+    model = ProtocolStep
+    form = ProtocolForm
+    enable_deletion = False
+    grid_fields = '__all__'
+    allowed_sort_orders = '__all__'
+    allowed_filter_fields = OrderedDict([
+        ('name', 'icontains'),
+        ('method', 'icontains')
+    ])

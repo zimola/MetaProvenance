@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 class Investigation(models.Model):
     """
@@ -7,15 +8,17 @@ class Investigation(models.Model):
     name = models.CharField(max_length=255)
     institution = models.CharField(max_length=255)
     description = models.TextField()
-
-
+    def __str__(self):
+        return self.name
+    
 class Sample(models.Model):
     """
     Uniquely identify a single sample (i.e., a physical sample taken at some single time and place)
     """
     name = models.CharField(max_length=255,unique=True)
     investigation = models.ForeignKey('Investigation', on_delete=models.CASCADE)  # fk 2
-
+    def __str__(self):
+        return self.name
 
 class SampleMetadata(models.Model):
     """
@@ -25,22 +28,17 @@ class SampleMetadata(models.Model):
     value = models.CharField(max_length=255)
     sample = models.ForeignKey('Sample', on_delete=models.CASCADE)  # fk 3
 
-
-
 class BiologicalReplicate(models.Model):
     """
     A sample resulting from a biological analysis of a collected sample.
     If a poo sample is a sample, the DNA extracted and amplified with primer
     set A is a BiologicalReplicate of that sample
-
-    metadata = BiologicalReplicateMetadata
-    protocol = BiologicalReplicateProtocol
-    protocol_deviations = ProtocolDeviations
     """
     name = models.CharField(max_length=255,unique=True)
-    sample = models.ForeignKey('Sample', on_delete=models.CASCADE)  # fk 1
+    sample = models.ForeignKey('Sample', on_delete=models.CASCADE, related_name='sample')  # fk 1
     sequence_file = models.ManyToManyField('Document') # store the location of the sequence file(s)
     biological_replicate_protocol = models.ForeignKey('BiologicalReplicateProtocol', on_delete=models.CASCADE)  # fk 5
+    #Should be locked down to match sample's Investigation field, but I can't
     investigation = models.ForeignKey('Investigation', on_delete=models.CASCADE)
 
 class BiologicalReplicateMetadata(models.Model):
@@ -83,28 +81,37 @@ class BiologicalReplicateProtocol(models.Model):
     """
     name = models.CharField(max_length=255)
     description = models.TextField()
-    #citation = models.TextField() # should we include citations, or just have that in description?
-
+    citation = models.TextField() # should we include citations, or just have that in description?
+#    protocol_steps = models.ManyToManyField('ProtocolStep')
 
 class ProtocolStep(models.Model):
     """
     Names and descriptions of the protocol steps and methods, e.g., stepname = 'amplification', method='pcr'
     """
-    step_name = models.CharField(max_length=255)
+    biological_replicate_protocols = models.ManyToManyField('BiologicalReplicateProtocol', blank=True)
+    name = models.CharField(max_length=255)
     method = models.CharField(max_length=255)
-    biological_replicate_protocol = models.ManyToManyField('BiologicalReplicateProtocol')  # fk 7
-
+    def __str__(self):
+        return '%s -> %s' % (self.name, self.method)
 
 class ProtocolStepParameter(models.Model):
     """
     The default parameters for each protocol step
     """
-    biological_replicate = models.ForeignKey('ProtocolStep', 
-                                             on_delete=models.CASCADE) # fk ??
+    protocol_step = models.ForeignKey('ProtocolStep', 
+                                             on_delete=models.CASCADE, verbose_name="Protocol Step") # fk ??
     name = models.CharField(max_length=255)
     value = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(blank=True)
 
+class ProtocolStepParameterDeviation(models.Model):
+    """
+    The deviations from the defaults, attached to a specific Replicate
+    """
+    protocol_step_parameter = models.ForeignKey('ProtocolStepParameter', on_delete=models.CASCADE)
+    biological_replicate = models.ForeignKey('BiologicalReplicate', on_delete=models.CASCADE)
+    new_value = models.CharField(max_length=255)
+    comment = models.TextField(blank=True)
 
 class PipelineResult(models.Model):
     """
@@ -113,6 +120,7 @@ class PipelineResult(models.Model):
     document = models.ManyToManyField('Document')
     computational_pipeline = models.ForeignKey('ComputationalPipeline', on_delete=models.CASCADE)
     pipeline_step = models.ForeignKey('PipelineStep', on_delete=models.CASCADE)
+    replicates = models.ManyToManyField('BiologicalReplicate')
 
 
 class PipelineDeviation(models.Model):
