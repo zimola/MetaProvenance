@@ -135,17 +135,18 @@ InvestigationDisplaySampleFormset = ko_inlineformset_factory(
                                                  Sample,
                                                  form=SampleDisplayForm)
 
-class InvestigationWithInlineFormsets(FormWithInlineFormsets):
-    FormClass = InvestigationForm
-    FormsetClasses = [InvestigationSampleFormset]
-
 class InvestigationWithInlineSamples(FormWithInlineFormsets):
     FormClass = InvestigationForm
     FormsetClasses = [InvestigationSampleFormset]
+    def get_formset_inline_title(self, formset):
+        return "Sample"
 
-class InvestigationDisplayWithInlineFormsets(FormWithInlineFormsets):
+
+class InvestigationDisplayWithInlineSamples(FormWithInlineFormsets):
      FormClass = InvestigationDisplayForm
      FormsetClasses = [InvestigationDisplaySampleFormset]
+     def get_formset_inline_title(self, formset):
+         return "Samples"
 
 SampleDisplayMetadataFormset = ko_inlineformset_factory(Sample,
                                                  SampleMetadata,
@@ -167,11 +168,15 @@ SampleReplicateFormset = ko_inlineformset_factory(Sample, BiologicalReplicate,
 class SampleWithInlineMetadata(FormWithInlineFormsets):
     FormClass = SampleForm
     FormsetClasses = [SampleMetadataFormset, SampleReplicateFormset]
+    def get_formset_inline_title(self, formset):
+        return "Sample Metadata"
 
 class SampleDisplayWithInlineMetadata(FormWithInlineFormsets):
     FormClass = SampleDisplayForm
     FormsetClasses = [SampleDisplayReplicateFormset, \
                       SampleDisplayMetadataFormset]
+    def get_formset_inline_title(self, formset):
+        return "Sample Metadata"
 
 ProtocolStepDisplayFormset = ko_inlineformset_factory(BiologicalReplicateProtocol,
                                                       ProtocolStep.biological_replicate_protocols.through,
@@ -185,6 +190,8 @@ ProtocolStepFormset = ko_inlineformset_factory(BiologicalReplicateProtocol,
 class ProtocolDisplayWithInlineSteps(FormWithInlineFormsets):
     FormClass = ProtocolDisplayForm
     FormsetClasses = [ProtocolStepDisplayFormset]
+    def get_formset_inline_title(self, formset):
+        return "Protocol Step"
 
 class ProtocolWithInlineSteps(FormWithInlineFormsets):
     FormClass = ProtocolForm
@@ -204,10 +211,14 @@ ProtocolStepParameterFormset = ko_inlineformset_factory(ProtocolStep,
 class ProtocolStepWithInlineParameters(FormWithInlineFormsets):
     FormClass = ProtocolStepForm
     FormsetClasses = [ProtocolStepParameterFormset]
+    def get_formset_inline_title(self, formset):
+        return "Protocol Step Parameter"
 
 class ProtocolStepDisplayWithInlineParameters(FormWithInlineFormsets):
     FormClass = ProtocolStepDisplayForm
     FormsetClasses = [ProtocolStepParameterDisplayFormset]
+    def get_formset_inline_title(self, formset):
+        return "Protocol Step Parameters"
 
 ''' Django Forms '''
 

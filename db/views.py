@@ -26,8 +26,8 @@ from .models import (
 )
 
 from .forms import (
-    InvestigationDisplayWithInlineFormsets, InvestigationWithInlineFormsets,
-    InvestigationWithInlineSamples, ProtocolForm, ProtocolDisplayWithInlineSteps, 
+    InvestigationDisplayWithInlineSamples, InvestigationWithInlineSamples,
+    ProtocolForm, ProtocolDisplayWithInlineSteps, 
     ProtocolStepWithInlineParameters, ProtocolStepDisplayWithInlineParameters,
     ProtocolWithInlineSteps, SampleDisplayWithInlineMetadata,
     SampleWithInlineMetadata
@@ -47,7 +47,8 @@ class InvestigationList(ListSortingView):
     #allowed_filter_fields = {'description': None}
     grid_fields = ['name', 'institution', 'description']
     list_display = ['edit_investigation']
-
+    def get_heading(self):
+        return "Investigation List"
     def edit_investigation(self, obj):
         return format_html(
            '<a href="{}"><span class="iconui iconui-edit"></span></a>',
@@ -78,32 +79,37 @@ class InvestigationList(ListSortingView):
         else:
             return super().get_display_value(obj, field)
 
-class InvestigationDetail(InlineDetailView):
-    pk_url_kwarg = 'investigation_id'
-    #template_name = 'investigation_edit.htm'
-    form_with_inline_formsets = InvestigationDisplayWithInlineFormsets
-
-class InvestigationUpdate(BsTabsMixin, InlineCrudView):
-    format_view_title = True
-    pk_url_kwarg = 'investigation_id'
-    form_with_inline_formsets = InvestigationWithInlineFormsets
     def get_bs_form_opts(self):
         return {
-            'class': 'investigation',
-            'title': format_html('Edit "{}"', self.object),
-            'submit_text': 'Save Investigation'
+            'title': "All Investigations",
+            'view_title': "All Investigations2",
+            'submit_text': "Save Investigation"
         }
 
 
+class InvestigationDetail(InlineDetailView):
+    pk_url_kwarg = 'investigation_id'
+    #template_name = 'investigation_edit.htm'
+    form_with_inline_formsets = InvestigationDisplayWithInlineSamples
 
-class InvestigationCreate(BsTabsMixin, InlineCreateView):
+class InvestigationUpdate(BsTabsMixin, InlineCrudView):
     format_view_title = True
     pk_url_kwarg = 'investigation_id'
     form_with_inline_formsets = InvestigationWithInlineSamples
     def get_bs_form_opts(self):
         return {
-            'class': 'investigation',
-            'title': 'Create investigation',
+            'title': format_html('Edit "{}"', self.object),
+            'submit_text': 'Save Investigation'
+        }
+
+class InvestigationCreate(BsTabsMixin, InlineCreateView):
+    format_view_title = True
+    pk_url_kwarg = 'investigation_id'
+    form_with_inline_formsets = InvestigationWithInlineSamples
+    def get_heading(self):
+        return "Create New Investigation"
+    def get_bs_form_opts(self):
+        return {
             'submit_text': 'Save Investigation'
         }
 
@@ -114,7 +120,8 @@ class SampleList(ListSortingView):
     model = Sample
     allowed_sort_orders = '__all__'
     grid_fields = ['name', 'investigation']
-
+    def get_heading(self):
+        return "Sample List"
     def get_name_links(self, obj):
         links = [format_html(
             '<a href="{}">{}</a>',
@@ -175,7 +182,8 @@ class ProtocolList(ListSortingView):
     model = BiologicalReplicateProtocol
     allowed_sort_orders = '__all__'
     grid_fields = ['name', 'description', 'citation']
-
+    def get_heading(self):
+        return "Protocol List"
     def get_name_links(self, obj):
         links = [format_html(
             '<a href="{}">{}</a>',
@@ -202,7 +210,8 @@ class ProtocolStepList(ListSortingView):
     model = ProtocolStep
     allowed_sort_orders = '__all__'
     grid_fields = ['name', 'method']
-
+    def get_heading(self):
+        return "Protocol Step List"
     def get_name_links(self, obj):
         links = [format_html(
             '<a href="{}">{}</a>',
@@ -234,6 +243,8 @@ class ProtocolCreate(BsTabsMixin, InlineCreateView):
     format_view_title = True
     pk_url_kwarg = 'protocol_id'
     form_with_inline_formsets = ProtocolWithInlineSteps
+    def get_heading(self):
+        return "Create New Protocol"
     def get_bs_form_opts(self):
         return {
             'title': 'Create Protocol',
@@ -252,7 +263,6 @@ class ProtocolUpdate(BsTabsMixin, InlineCrudView):
         return {
             'title': 'Update Protocol',
             'submit_text': 'Save Protocol',
-            'inline_title': 'Protocol Steps'
         }
 
     def get_success_url(self):
@@ -267,9 +277,10 @@ class ProtocolStepCreate(BsTabsMixin, InlineCreateView):
     format_view_title = True
     pk_url_kwarg = 'protocol_step_id'
     form_with_inline_formsets = ProtocolStepWithInlineParameters
+    def get_heading(self):
+        return "Create New Protocol Step"
     def get_bs_form_opts(self):
         return {
-                'class': 'protocolstep',
                 'title': 'Create Protocol Step',
                 'submit_text': 'Save Protocol Step'
                 }
